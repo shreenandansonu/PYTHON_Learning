@@ -1,5 +1,5 @@
 from complex import ComplexNumber
-with open("Python Begineer\data.txt","r") as data: #please change the directory accordingly
+with open("Complex Calculator\data.txt","r") as data: #please change the directory accordingly
     try:
         while True:
             C1=data.readline()

@@ -20,7 +20,7 @@ class Account:
             if name == df["Name"][x]:
                 if pswdin ==str(df["Password"][x]):
                     balance = df["Amount"][x]
-                    print(f"Your Current Balance is {balance}")
+                    print(f"💵 Your Current Balance is {balance} 💵")
                     break
                 else:
                     print("⚠️ Wrong Password ⚠️")

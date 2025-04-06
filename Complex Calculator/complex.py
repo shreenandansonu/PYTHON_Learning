@@ -1,3 +1,6 @@
+#This module deals with Complex Calculation
+# This uses the OOPS concepts of Abstraction,Encapsulation and Polymorphisim. 
+
 import math
 class ComplexNumber():
     def __init__(self,a=0,b=0):
