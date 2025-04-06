@@ -17,8 +17,9 @@ while True:
             Account(name,amount,pswd)
         case 2:
             name,pswd=input("Please Enter Name and Password: ").split(",")
+            Name: Account=name
             print("_________________________________\n")
-            Account.GetBalance(name,pswd.strip())
+            Name.GetBalance(pswd.strip())
 
 
 

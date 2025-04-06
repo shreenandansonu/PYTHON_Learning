@@ -12,12 +12,11 @@ class Account:
         print(f"✅ Account  {self.name} Created.✨\n💵 Initial Amount is Rs {self.balance:.2f}.\n")
         print("_________________________________\n")
 
-    @staticmethod
-    def GetBalance(name,pswdin):
+    def GetBalance(self,pswdin):
         df=pd.read_csv("Banking System/accounts.csv")
         x=0
         while True:
-            if name == df["Name"][x]:
+            if str(self) == df["Name"][x]:
                 if pswdin ==str(df["Password"][x]):
                     balance = df["Amount"][x]
                     print(f"💵 Your Current Balance is {balance} 💵")
