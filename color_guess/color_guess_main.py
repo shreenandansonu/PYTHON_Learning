@@ -8,7 +8,7 @@ def generate_color() -> str :
     return sequence
 
 def check_sequence(sequence: str, guess: str) -> tuple[ int, int]:
-    guess.upper()
+    guess=guess.upper()
     correct,incorrect=0,0
     for i in range(4):
         if(sequence[i] == guess[i]):
