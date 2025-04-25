@@ -1,9 +1,11 @@
-from bank import *
-shree = savingsAcct("shree", 1000)
-shree.deposit(1000)
-shree.GetBalance()
+# cook your dish here
+testcase = int(input())
 
-suru= savingsAcct("suru", 1000)
-suru.withdrawal(500)
-
-shree.Transfer(suru,1000)
+for i in range(testcase):
+    count = 0
+    N = int(input())
+    A = list(map(int,input().split()))
+    for a in A:
+        if a > 1:
+            count+=(a-1)
+    print(count)
