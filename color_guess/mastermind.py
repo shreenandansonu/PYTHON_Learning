@@ -7,7 +7,7 @@ root.iconbitmap("color_guess\wheel.ico")
 root.geometry('640x380')
 root.maxsize(width=640,height=380)
 root.minsize(width=640,height=380)
-root.columnconfigure(0,weight=1)
+root.sticky="news",padx=5(0,weight=1)
 root.config(background="#283618")
 
 # ----------------------------------------------------------------------------------------------------------------

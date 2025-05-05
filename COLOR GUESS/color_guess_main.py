@@ -7,7 +7,7 @@ def generate_color() -> str :
         sequence+=random.choice(color_list)
     return sequence
 
-def check_sequence(sequence: str, guess: str) -> tuple[ int, int]:
+def check_sequence(sequence: str, guess: str) -> tuple[ int, int, bool]:
     guess=guess.upper()
     correct,incorrect=0,0
     for i in range(4):

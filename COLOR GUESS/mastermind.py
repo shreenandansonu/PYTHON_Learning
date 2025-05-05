@@ -13,11 +13,11 @@ root.config(background="#283618")
 # ----------------------------------------------------------------------------------------------------------------
 
 sequence=color_guess_main.generate_color()
-time=0
+times=0
 print(sequence)
 def colorguess(event=None):
-    global time #using a variable which is out of the function scope
-    time +=1
+    global times #using a variable which is out of the function scope
+    times +=1
     guess=code_entry.get()
     c=color_guess_main.check_sequence(sequence,guess)[0]
     i=color_guess_main.check_sequence(sequence,guess)[1]
@@ -25,27 +25,28 @@ def colorguess(event=None):
     if(c==4):
         correct_cnt.config(text=c)
         incorrect_cnt.config(text=i)
-        total_time.config(text=time)
-        instruction.config(text="✅🎉 You Won in {time} Rounds 🎉✅")
-        reset()
+        total_time.config(text=times)
+        instruction.config(text=f"✅🎉 You Won in {times} Rounds 🎉✅")
+        root.after(2000,reset)
     else:
         correct_cnt.config(text=c)
         incorrect_cnt.config(text=i)   
-        if(time<10):
-            total_time.config(text=time)
+        if(times<10):
+            total_time.config(text=times)
         else:
-            total_time.config(text=time,foreground="#ffd60a")  
+            total_time.config(text=times,foreground="#ffd60a")  
 
 
 def reset():
-    global sequence, time
+    global sequence, times
     sequence = color_guess_main.generate_color()  
-    time = 0                                       
+    times = 0                                       
     print(sequence)                                
     correct_cnt.config(text="0")
     incorrect_cnt.config(text="0")
     total_time.config(text="0")
     instruction.config(text="Choose 4 Color Sequence from the list R,G,B,V,Y,O,W")
+    total_time.config(text=times,foreground="#fefae0") 
     code_entry.delete(0, tk.END)  
 # ----------------------------------------------------------------------------------------------------------------
 
@@ -78,7 +79,7 @@ incorrectcnt.grid(row=0,column=2,sticky="ew",padx=10)
 incorrect_cnt=tk.Label(info_frame,text="0",font=("Oswald",25),foreground="#fefae0",background="#bc6c25")
 incorrect_cnt.grid(row=0,column=3)
 
-totaltime=tk.Label(info_frame,text="Times",font=("Oswald",15),foreground="#dda15e",background="#bc6c25")
+totaltime=tk.Label(info_frame,text="Rounds",font=("Oswald",15),foreground="#dda15e",background="#bc6c25")
 totaltime.grid(row=0,column=4,sticky="ew",padx=10)
 
 total_time=tk.Label(info_frame,text="0",font=("Oswald",25),foreground="#fefae0",background="#bc6c25")
@@ -111,8 +112,11 @@ for col in range(7):
 
 # enter=tk.Button(buttons_frame,text="ENTER",font=("Oswald",15),foreground="#283618",background="#dda15e")
 # enter.grid(row=0,column=5,sticky="nsew",padx=10)
-reset=tk.Button(buttons_frame,text="RESET",font=("Oswald",15),foreground="#fefae0",background="#bc6c25",activebackground="#dda15e",activeforeground="#fefae0",command=reset)
-reset.grid(row=0,column=6,sticky="nsew",padx=7,pady=12)
+reset_btn=tk.Button(buttons_frame,text="RESET",font=("Oswald",15),foreground="#fefae0",background="#bc6c25",activebackground="#dda15e",activeforeground="#fefae0",command=reset)
+reset_btn.grid(row=0,column=6,sticky="nsew",padx=7,pady=12)
 
 
 root.mainloop()
+
+# pyinstaller --onefile --noconsole --icon=wheel.ico mastermind.py
+
