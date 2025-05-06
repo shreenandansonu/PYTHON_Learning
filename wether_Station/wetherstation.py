@@ -68,7 +68,7 @@ def humidity(humid):
 
 root=tk.Tk()
 root.title("Wether Station")
-root.iconbitmap("wether_Station\img.ico")
+root.iconbitmap("img.ico")
 root.geometry(f'{w}x{h}')
 root.maxsize(width=w,height=h)
 root.minsize(width=w,height=h)
