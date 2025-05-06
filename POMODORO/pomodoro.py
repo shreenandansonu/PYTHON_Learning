@@ -53,7 +53,7 @@ def update_counter(tim):
         restart["state"]="disabled"
         playpause["state"]="disabled"
         if is_interupt:
-            messagebox.showinfo("Countdown Endded","You Restarted The Countdown")
+            messagebox.showwarning("Countdown Endded","You Restarted The Countdown")
             is_interupt=False
         else:
             messagebox.showinfo("Countdown Endded",f"GREAT JOB! 🎉 \n Your {time_value.get()} minutes session ended.")
@@ -85,7 +85,7 @@ headframe.rowconfigure(0,weight=1)
 headframe.columnconfigure(0,weight=1)
 name=tk.Label(headframe,text="POMODORO",font=("Oswald Medium",30),foreground=c2,bg=c4)
 name.grid(column=0,row=0)
-timevalue=["00:00","01:00","15:00","20:00","25:00","30:00","40:00","45:00","50:00","60:00"]
+timevalue=["00:00","01:00","05:00","10:00","15:00","20:00","25:00","30:00","40:00","45:00","50:00","60:00"]
 time_show_frame=tk.LabelFrame(root,text="COUNTDOWN",bg=c2,font=("Oswald",10))
 time_show_frame.grid(column=0,row=1,rowspan=1,sticky="news",padx=5)
 time_show_frame.columnconfigure(0,weight=1)
