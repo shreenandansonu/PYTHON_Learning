@@ -2,7 +2,7 @@ import serial
 import wave
 import struct
 
-port = 'COM23'  # Change this to your ESP32 Bluetooth COM port
+port = 'COM24'  # Change this to your ESP32 Bluetooth COM port
 baudrate = 115200
 duration = 10  # Record for 10 seconds
 sample_rate = 8000

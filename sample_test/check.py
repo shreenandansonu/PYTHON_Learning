@@ -5,44 +5,51 @@ import numpy as np
 from scipy.signal import butter, filtfilt
 
 # === CONFIG ===
-PORT = 'COM24'         # Replace with your COM port (e.g., 'COM5' on Windows or '/dev/rfcomm0' on Linux)
+PORT = 'COM23'         # Update this with the correct COM port
 BAUDRATE = 115200
 DURATION_SECONDS = 10
-name=input("Please Enter Name:- ")
-soundtype=input("Please enter 1 for heart and 2 for lungs:- ")
-types="1"
-if(soundtype=="1"):
-    types="_Heart_"
-elif soundtype=="2":
-    types="_Lungs_"
-OUTPUT_FILENAME = name+types+".wav"
 SAMPLE_RATE = 8000
 CHANNELS = 1
-SAMPLE_WIDTH = 1  # 1 byte = 8-bit audio
+SAMPLE_WIDTH = 1  # 8-bit audio (1 byte)
+
+# === USER INPUT ===
+name = input("Please Enter Name: ")
+soundtype = input("Enter 1 for Heart or 2 for Lungs: ")
+if soundtype == "1":
+    types = "_Heart_"
+elif soundtype == "2":
+    types = "_Lungs_"
+else:
+    print("Invalid input. Defaulting to _Unknown_.")
+    types = "_Unknown_"
+
+OUTPUT_FILENAME = name + types + ".wav"
 
 # === FILTER CONFIG ===
-LOW_CUT = 60    # Low cut frequency (Hz)
-HIGH_CUT = 200  # High cut frequency (Hz)
-ORDER = 4       # Filter order
-GAIN = 48       # Roll-off in dB per octave (by adjusting filter order)
+LOW_CUT = 60     # Hz
+HIGH_CUT = 200   # Hz
+ORDER = 4        # Filter order
 
-# Butterworth Bandpass Filter Design
+# === Bandpass Filter Design ===
 def butter_bandpass(lowcut, highcut, fs, order=4):
-    nyquist = 0.5 * fs
-    low = lowcut / nyquist
-    high = highcut / nyquist
+    nyq = 0.5 * fs
+    low = lowcut / nyq
+    high = highcut / nyq
     b, a = butter(order, [low, high], btype='band')
     return b, a
 
-# === OPEN SERIAL PORT ===
-ser = serial.Serial(PORT, BAUDRATE, timeout=1)
-print(f"Connected to {PORT} at {BAUDRATE} baud")
+# === Serial Setup ===
+try:
+    ser = serial.Serial(PORT, BAUDRATE, timeout=1)
+    print(f"Connected to {PORT} at {BAUDRATE} baud")
+except serial.SerialException as e:
+    print(f"Failed to connect to {PORT}: {e}")
+    exit(1)
 
-# === CAPTURE AUDIO ===
+# === Capture Audio ===
+print(f"Recording for {DURATION_SECONDS} seconds...")
 audio_data = bytearray()
 start_time = time.time()
-
-print(f"Recording for {DURATION_SECONDS} seconds...")
 
 while time.time() - start_time < DURATION_SECONDS:
     if ser.in_waiting:
@@ -52,21 +59,29 @@ while time.time() - start_time < DURATION_SECONDS:
 ser.close()
 print(f"Captured {len(audio_data)} bytes")
 
-# Convert audio data to numpy array
-audio_data_np = np.frombuffer(audio_data, dtype=np.uint8)
+# === Process Audio ===
+if len(audio_data) == 0:
+    print("No data captured.")
+    exit(1)
 
-# Apply bandpass filter to audio data
+# Convert byte data to numpy array
+audio_np = np.frombuffer(audio_data, dtype=np.uint8)
+
+# Normalize from 8-bit unsigned (0–255) to -1.0 to 1.0 float for filtering
+audio_norm = (audio_np.astype(np.float32) - 128) / 128.0
+
+# Apply Bandpass Filter
 b, a = butter_bandpass(LOW_CUT, HIGH_CUT, SAMPLE_RATE, ORDER)
-filtered_audio = filtfilt(b, a, audio_data_np)
+filtered = filtfilt(b, a, audio_norm)
 
-# Convert filtered audio back to bytearray
-filtered_audio_bytearray = filtered_audio.astype(np.uint8).tobytes()
+# Rescale back to 8-bit unsigned integers (0–255)
+filtered_uint8 = np.clip((filtered * 128) + 128, 0, 255).astype(np.uint8)
 
-# === SAVE AS WAV FILE ===
+# === Save as WAV File ===
 with wave.open(OUTPUT_FILENAME, 'wb') as wf:
     wf.setnchannels(CHANNELS)
     wf.setsampwidth(SAMPLE_WIDTH)
     wf.setframerate(SAMPLE_RATE)
-    wf.writeframes(filtered_audio_bytearray)
+    wf.writeframes(filtered_uint8.tobytes())
 
-print(f"Saved as {OUTPUT_FILENAME}")
+print(f"Saved filtered audio as: {OUTPUT_FILENAME}")
