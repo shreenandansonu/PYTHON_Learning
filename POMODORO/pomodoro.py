@@ -1,5 +1,35 @@
 import tkinter as tk
 from tkinter import messagebox
+import sqlite3 as sq3
+from datetime import datetime
+
+
+
+#creating a table if doesnt exist
+
+# def MakeTable():
+#     con=sq3.connect("POMODORO/pomodoro.db")
+#     cur=con.cursor()
+#     cur.execute ( """CREATE TABLE sessions
+#                 (
+#                 id INTEGER PRIMARY KEY AUTOINCREMENT,
+#                 session_duration TEXT,
+#                 session_date TEXT
+            
+#                 )""")
+#     con.commit()
+#     con.close
+#     print("Table Created Successfully")
+    
+
+def saveinfo():
+    con=sq3.connect("POMODORO/pomodoro.db")
+    cur=con.cursor()
+    session_duration=time_value.get()
+    session_date=datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    cur.execute("INSERT INTO sessions(session_duration,session_date) VALUES(?,?)",(session_duration,session_date))
+    con.commit()
+    con.close()
 
 c1="#e63946"
 c2="#f1faee"
@@ -12,7 +42,7 @@ root.geometry('300x400')
 root.maxsize(height=h,width=w)
 root.minsize(height=h,width=w)
 root.title("POMODORO")
-root.iconbitmap("clock.ico")
+root.iconbitmap("POMODORO\clock.ico")
 root.config(bg=c2)
 root.columnconfigure(0,weight=1)
 
@@ -56,6 +86,7 @@ def update_counter(tim):
             messagebox.showwarning("Countdown Endded","You Restarted The Countdown")
             is_interupt=False
         else:
+            saveinfo()
             messagebox.showinfo("Countdown Endded",f"GREAT JOB! 🎉 \n Your {time_value.get()} minutes session ended.")
 
 def reset_counter():
@@ -85,7 +116,7 @@ headframe.rowconfigure(0,weight=1)
 headframe.columnconfigure(0,weight=1)
 name=tk.Label(headframe,text="POMODORO",font=("Oswald Medium",30),foreground=c2,bg=c4)
 name.grid(column=0,row=0)
-timevalue=["00:00","01:00","05:00","10:00","15:00","20:00","25:00","30:00","40:00","45:00","50:00","60:00"]
+timevalue=["00:02","01:00","05:00","10:00","15:00","20:00","25:00","30:00","40:00","45:00","50:00","60:00"]
 time_show_frame=tk.LabelFrame(root,text="COUNTDOWN",bg=c2,font=("Oswald",10))
 time_show_frame.grid(column=0,row=1,rowspan=1,sticky="news",padx=5)
 time_show_frame.columnconfigure(0,weight=1)
@@ -134,4 +165,6 @@ brand.grid(row=4,padx=padx,pady=pady+2)
 
 root.mainloop()
 
+
 #pyinstaller --onefile --noconsole --icon=clock.ico pomodoro.py
+
