@@ -7,36 +7,58 @@ from datetime import datetime
 
 #creating a table if doesnt exist
 
-# def MakeTable():
-#     con=sq3.connect("POMODORO/pomodoro.db")
-#     cur=con.cursor()
-#     cur.execute ( """CREATE TABLE sessions
-#                 (
-#                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-#                 session_duration TEXT,
-#                 session_date TEXT
-            
-#                 )""")
-#     con.commit()
-#     con.close
-#     print("Table Created Successfully")
-    
+def MakeTable():
+    con=sq3.connect("POMODORO/pomodoro.db")
+    cur=con.cursor()
+    cur.execute ( """CREATE TABLE IF NOT EXISTS sessions
+                (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                session_duration TEXT,
+                session_date TEXT,
+                session_time TEXT  
+                )""")
+    con.commit()
+    con.close
+    print("Table Created Successfully")
+
+MakeTable()
 
 def saveinfo():
     con=sq3.connect("POMODORO/pomodoro.db")
     cur=con.cursor()
     session_duration=time_value.get()
-    session_date=datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    cur.execute("INSERT INTO sessions(session_duration,session_date) VALUES(?,?)",(session_duration,session_date))
+    session_date=datetime.now().strftime("%Y-%m-%d")
+    global time_start
+    session_time=time_start
+    cur.execute("INSERT INTO sessions (session_duration,session_date, session_time) VALUES(?,?,?)",(session_duration,session_date,session_time))
     con.commit()
     con.close()
+
+def Get2DaysDuration():
+    con=sq3.connect("POMODORO/pomodoro.db")
+    cur=con.cursor()
+    cur.execute("SELECT * FROM sessions WHERE session_date == date('now')")
+    data=cur.fetchall()
+    if not data:
+        duration_of_session.config(text="Start your First Session")
+    else:
+        total_duration=0
+        for i in data:
+            dur=i[1]
+            min,sec=map(int,dur.split(":"))
+            total_duration+=min*(60)+sec
+        duration_of_session.config(text="Today's Session Duration: "+ str(total_duration//60)+" mins "+str(total_duration%60)+" secs ")
+    con.close()
+
+
+
 
 c1="#e63946"
 c2="#f1faee"
 c3="#a8dadc"
 c4="#1d3557"
-h=400
-w=300
+h=450
+w=350
 root=tk.Tk()
 root.geometry('300x400')
 root.maxsize(height=h,width=w)
@@ -46,7 +68,8 @@ root.iconbitmap("POMODORO\clock.ico")
 root.config(bg=c2)
 root.columnconfigure(0,weight=1)
 
-
+#declairing global variables
+time_start=0
 wait=None
 totaltime=0
 is_paused=False
@@ -54,6 +77,8 @@ is_interupt=False
 
 def start_countdown():
     # messagebox.showinfo("Countdown Started",f"Your {time_value.get()} minutes session starts now.")
+    global time_start
+    time_start = datetime.now().strftime("%H:%M:%S")
     select_time["state"]="disabled"
     start["state"]="disabled"
     restart["state"]="normal"
@@ -65,6 +90,7 @@ def start_countdown():
     totaltime=min*60+sec
     # print(totaltime)
     update_counter(totaltime)
+    Get2DaysDuration()
     
 def update_counter(tim):
     global totaltime, is_interupt
@@ -83,11 +109,15 @@ def update_counter(tim):
         restart["state"]="disabled"
         playpause["state"]="disabled"
         if is_interupt:
+            Get2DaysDuration()
             messagebox.showwarning("Countdown Endded","You Restarted The Countdown")
             is_interupt=False
+            
         else:
             saveinfo()
+            Get2DaysDuration()
             messagebox.showinfo("Countdown Endded",f"GREAT JOB! 🎉 \n Your {time_value.get()} minutes session ended.")
+            
 
 def reset_counter():
     global is_interupt
@@ -160,10 +190,14 @@ playpause.grid(column=1,row=1,padx=padx)
 for col in range(3):
     control_frame.columnconfigure(col,weight=1)
 
+duration_of_session=tk.Label(root,text="Today's Session Duration",bg=c1,fg=c2,font=("Oswald",12))
+duration_of_session.grid(row=4,padx=padx,pady=pady+2,sticky="news")
 brand=tk.Label(root,text="Designed & developed by Shreenandan Sahu with 💓",bg=c2,font=("Oswald",10))
-brand.grid(row=4,padx=padx,pady=pady+2)
+brand.grid(row=5,padx=padx,pady=pady+2)
 
+Get2DaysDuration()
 root.mainloop()
+
 
 
 #pyinstaller --onefile --noconsole --icon=clock.ico pomodoro.py
